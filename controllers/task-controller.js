@@ -6,10 +6,11 @@ const taskRoutes = Router();
 const prisma = new PrismaClient();
 
 taskRoutes.post('/', checkAuthMiddleware, async (req, res) => {
-  try {
-    const { titulo, descricao, prioridade, data_limite, id_coluna } = req.body;
 
-    if (!titulo || !descricao || !data_limite) {
+  try {
+    const { titulo, descricao, prioridade, data_limite } = req.body;
+
+    if (!titulo || !data_limite) {
       return res.status(400).json({ mensagem: 'Campos obrigatórios ausentes' , status: 400});
     }
 
@@ -125,9 +126,19 @@ taskRoutes.patch('/:id/move', checkAuthMiddleware, async (req, res) => {
       return res.status(404).json({ mensagem: 'Tarefa não encontrada', status: 404 });
     }
 
+    const column = await prisma.coluna.findFirst({
+      where: {
+        id: id_coluna
+      }
+    });
+
+    if(!column){
+      return res.status(404).json({ mensagem: 'Coluna não encontrada', status: 404 });
+    }
+
     const movedTask = await prisma.tarefa.update({
       where: { id: task.id },
-      data: { id_coluna },
+      data: { id_coluna, status: column.titulo },
     });
 
     res.json({ mensagem: 'Tarefa movida com sucesso', tarefa: movedTask, status: 200 });

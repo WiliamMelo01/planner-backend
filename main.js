@@ -4,6 +4,7 @@ import userRoutes from './controllers/user-controller.js';
 import authRoutes from './controllers/auth-controller.js';
 import taskRoutes from './controllers/task-controller.js';
 import columnRoutes from './controllers/column-controller.js';
+import cors from "cors";
 
 const app = express();
 
@@ -11,6 +12,7 @@ const PORT =  process.env.PORT || 3000;
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(cors());
 
 app.use('/api/v1/users', userRoutes);
 
